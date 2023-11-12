@@ -1,0 +1,38 @@
+version: "3"
+services:
+  veridionFrontend:
+    image: z0rg3d/veridion-frontend:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_BACKEND_URL=veridionBackend
+      - REACT_APP_BACKEND_PORT=3001
+
+  veridionBackend:
+    image: z0rg3d/veridion-backend:latest
+    ports:
+      - "3001:3001"
+    environment:
+      - VERIDION_API_URL=https://data.soleadify.com/match/v4/companies/?min_match_score=0.6
+      - VERIDION_API_KEY=T0U9qKCVhtiDBUdblJovoz1Af70P7TeNsYOjWJ7K8gXngbB97PGnMAo4JNiA
+      - CHATGPT_API_KEY=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
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASS=1234
+      - FRONTEND_URL=veridionFrontend:3000
+      - BACKEND_PORT=3001
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --save 20 1 --loglevel warning --requirepass 1234
+    volumes:
+      - cache:/data
+
+volumes:
+  cache:
+    driver: local
